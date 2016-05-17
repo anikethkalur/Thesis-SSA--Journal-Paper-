@@ -1,0 +1,773 @@
+% `template.tex', a bare-bones example employing the AIAA class.
+%
+% For a more advanced example that makes use of several third-party
+% LaTeX packages, see `advanced_example.tex', but please read the
+% Known Problems section of the users manual first.
+%
+% Typical processing for PostScript (PS) output:
+%
+%  latex template
+%  latex template   (repeat as needed to resolve references)
+%
+%  xdvi template    (onscreen draft display)
+%  dvips template   (postscript)
+%  gv template.ps   (onscreen display)
+%  lpr template.ps  (hardcopy)
+%
+% With the above, only Encapsulated PostScript (EPS) images can be used.
+%
+% Typical processing for Portable Document Format (PDF) output:
+%
+%  pdflatex template
+%  pdflatex template      (repeat as needed to resolve references)
+%
+%  acroread template.pdf  (onscreen display)
+%
+% If you have EPS figures, you will need to use the epstopdf script
+% to convert them to PDF because PDF is a limmited subset of EPS.
+% pdflatex accepts a variety of other image formats such as JPG, TIF,
+% PNG, and so forth -- check the documentation for your version.
+%
+% If you do *not* specify suffixes when using the graphicx package's
+% \includegraphics command, latex and pdflatex will automatically select
+% the appropriate figure format from those available.  This allows you
+% to produce PS and PDF output from the same LaTeX source file.
+%
+% To generate a large format (e.g., 11"x17") PostScript copy for editing
+% purposes, use
+%
+%  dvips -x 1467 -O -0.65in,0.85in -t tabloid template
+%
+% For further details and support, read the Users Manual, aiaa.pdf.
+
+
+% Try to reduce the number of latex support calls from people who
+% don't read the included documentation.
+%
+\typeout{}\typeout{If latex fails to find aiaa-tc, read the README file!}
+%
+
+
+\documentclass[]{aiaa-tc}% insert '[draft]' option to show overfull boxes
+
+ \title{Improved Data Association for Space Object Identification using Gating Methods and Planar Triangles}
+
+ \author{
+  Aniekth Kalur%
+    \thanks{Graduate Student, Mechanical and Aerospace Department}
+  \ and Paul Silversmith\thanksibid{1}\\
+  {\normalsize\itshape
+   University at Buffalo, Buffalo, New York, 14260, USA}\\
+  \and
+  John L. Crassidis%
+   \thanks{CUBRC Professor in space situational awareness, Mechanical and Aerospace Department}\\
+  {\normalsize\itshape
+  University at Buffalo, Buffalo, New York, 14260, USA}
+ }
+
+ % Data used by 'handcarry' option if invoked
+ \AIAApapernumber{YEAR-NUMBER}
+ \AIAAconference{Conference Name, Date, and Location}
+ \AIAAcopyright{\AIAAcopyrightD{YEAR}}
+
+% Packages used
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multicol, multirow}
+\usepackage[reqno]{amsmath}
+\usepackage{epstopdf}
+\usepackage{epstopdf}
+\DeclareGraphicsExtensions{.eps}
+\usepackage{cleveref}
+
+ % Define commands to assure consistent treatment throughout document
+ \newcommand{\eqnref}[1]{(\ref{#1})}
+ \newcommand{\class}[1]{\texttt{#1}}
+ \newcommand{\package}[1]{\texttt{#1}}
+ \newcommand{\file}[1]{\texttt{#1}}
+ \newcommand{\BibTeX}{\textsc{Bib}\TeX}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Closely spaced debris creates an setting that is very similar to a multi-target environment in a tracking problem. This environment engenders a major identification problem in the field of space situational awareness. To address this problem a method that couples gating methods for data association along with a planar triangle based pattern recognition algorithm has been developed. The planar triangular method has been shown to work effectively for spacecraft attitude determination by comparing stars in field of view to those present in the catalog. The effective identification of resident space debris using planar triangle method is demonstrated. This work also develops a novel approach to identify closely spaced debris-a validation gate based approach  coupled with the planar triangle method. This approach enables one to improve the accuracy of a planar triangle method for identifying debris that are very close to each other. The work in this paper shows the effectiveness of combining traditional data association methods with existing pattern recognition algorithm for space object identification. The elliptical gating approach significantly improves the planar triangular methods accuracy and also improves space object identification from closely spaced clutters.
+\end{abstract}
+
+
+\section{Introduction}
+
+Space situational awareness deals with collecting and maintaining knowledge of all objects orbiting the earth. Space Situational Awareness (SSA) is defined
+as the comprehensive knowledge of space objects and the ability to track, understand and predict their future location \cite{becker_space_2015}. These objects are also called orbital debris, which are a collection of defunct objects that orbit around earth. These objects pose a major threat to operational spacecrafts. In space, uncontrolled objects do not follow a straight line, each piece of debris is subjected to drift and decay. Variation of earths gravitational field causes drift and this can lead to gradual movement of object from one orbital plane to another. Atmospheric drag is a major cause orbital decay, thereby causing a slow decrease in altitude of the debris. \\
+
+ A very common term associated with Resident Space Objects (RSOs) in space is the \textit{Kessler syndrome}. Kessler syndrome theorizes that creation of new debris occurs faster than time taken by natural forces to remove them. As space object density  increases, the collision between objects could cause a cascading effect i.e. each collision generating more debris and thereby increasing the likelihood of further collisions. There are more than 21,000 piece of debris with a radius larger than 10 centimeters  - similar to that of a soft ball\cite{nasa_nasa_2015}. These 21,000 pieces of debris are open to the same threat of collisions as defined by the Kessler syndrome. A recent statistic talks about how the International Space Station (ISS) had to perform 5 collision avoidance maneuvers in 2014, this has been the highest number of avoidance maneuvers recorded since 1998~\cite{nasa_orbital_2015}. On JUL 16, 2015 the international space station crew were forced to scramble to safety in the Soyuz escape capsule after NASA received data on a fast approaching space debris\cite{evasive_2015}. The data regarding a debris being in close proximity, and on a probable collision course with the ISS was  received late and was imprecise as well. Hence the ISS could not make any evasive maneuvers. These close calls not only endanger humans lives but pose a major threat to the many functional spacecrafts and scientific equipment present in space. This makes it imperative to effectively study and develop methods for information fusion and RSO identification to improve space situational awareness.\\
+
+A lot of work is being done in the field of space situational awareness in the recent years. A common element among all of the other works in this field is that a customized approach for
+each technique is required for astrodynamics applications. The work on tracking multiple number of objects using finite-set statistics and finite mixture models representation of multi object probability density function is developed in Ref.~\citen{demars_2015}. The use of magnetometers in identifying space objects in geosynchronous orbits has been studied and discussed in Ref.~\citen{holzinger_2014}. The system requirements and challenges of multi-target tracking for space situational awareness have been addressed and the $\partial$- Genral Labeled Multi-Bernoulli ($\partial$-GLMB) filter has been studied. The additional work on pattern recognition has led to the development of a method that uses planar triangle properties for spacecraft attitude determination in lieu of the angle method.  This method is the planar triangle method (PTM). The PTM is shown to be an accurate and efficient method of pattern recognition and has been proven to work very well for spacecraft attitude determination \cite{cole_fast_2006}. Pattern recognition is another approach to data association. Pattern recognition algorithms attempt to match measurements with a certain target by using geometric data analysis. Given a cluster of data and stored \textit{a priori} knowledge of the suspected targets, it is anticipated that this data will maintain a specific pattern that can be associated with the assigned targets. This work uses the planar triangle methods as an effective pattern recognition methods for effective RSO identification, the details of will be explained in Section \ref{model}.\\ 
+
+The problem of identifying the true object from a cluster of similar objects can be addressed by data association. These problems have been very well studied in case of target tracking and multiple target tracking in  Ref. \citen{design_tracking}. The process of matching a measured object to its truth is called data association. The study of data association has been studied in detail for target tracking in surveillance systems employing one or more sensors. Many algorithms like the nearest neighbor (NN), global nearest neighbor(GNN), multiple hypothesis tracking (MHT), joint probabilistic data association (JPDA) have been extensively studied in Ref. \citen{design_tracking}. In this paper we use traditional data association methods like elliptical/validation gates. The elliptical gates and its use will be discussed in Section \ref{model}.
+
+\subsection{RSO Modelling}
+
+\subsubsection{Two-Body Problem}
+
+The two-body problem defines the motion of two bodies that interact only with each other, due to gravity. Newton's law of universal gravitation governs the fundamental theory of interaction. All objects attract each other with a force of gravitational attraction. This force of gravitational attraction is directly dependent upon the masses of both objects and inversely proportional to the square of the distance that separates their centers. The law can be expressed as
+\begin{equation}
+F=G\frac{m_1m_2}{r^2}
+\end{equation}
+where $m_1$ and $m_2$ are the masses of body 1 and body 2 respectively, $r$ is the distance that separates their centers, and $G$ is the universal gravitational constant.\\
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.8\textwidth]{two_body_problem}
+  \caption{Two-Body Problem}
+  \label{fig:two_body_problem}
+\end{figure}
+
+Choosing a standard rectangular coordinate system such that body 1 has position $\mathbf{r}_1$ and body 2 has position $\mathbf{r}_2$ as shown in Figure \ref{fig:two_body_problem}, the relative position vector $\mathbf{r}$ pointing from body 1 to body 2 is $\mathbf{r}=\mathbf{r}_2-\mathbf{r}_1$. Assuming that each body experiences a general disturbance force, $\mathbf{f}_{\text{d}}$, the sum of forces on each body can be described as
+\begin{subequations}
+\begin{align}
+\label{eq:force1}
+\mathbf{F}_{1,2}&=m_1\mathbf{\ddot{r}}_1=G\frac{m_1m_2}{r^3}\mathbf{r}+\mathbf{f}_{\text{d1}}\\
+\label{eq:force2}
+\mathbf{F}_{2,1}&=m_2\mathbf{\ddot{r}}_2=-G\frac{m_1m_2}{r^3}\mathbf{r}+\mathbf{f}_{\text{d2}}
+\end{align}
+\end{subequations}
+Subtracting Eqs. \eqref{eq:force1} and \eqref{eq:force2} gives
+\begin{subequations}
+\begin{gather}
+\label{eq:rddot}
+\mathbf{\ddot{r}}=-\frac{\mu_g}{r^3}\mathbf{r}+\mathbf{a}_{\text{d}}\\
+\mu_g=G(m_1+m_2)\approx G m_1
+\end{gather}
+\end{subequations}
+where $\mathbf{a}_{\text{d}}$ is a disturbance acceleration, $\mu_g$ is the gravitational coefficient, and it is assumed that $m_2$ is negligible with respect to $m_1$.\\
+
+Earth's gravitation field on low-Earth orbit objects varies due to Earth's irregular shape and mass distribution. The gravity potential for an arbitrary body is expressed as \cite{schaub_analytical_2009}
+\begin{align}
+V(r,\phi)=-\frac{Gm}{r}\left[1-\sum\limits_{k=2}^\infty\left(\frac{r_{\text{eq}}}{r}\right)^k J_k P_k (\sin\phi)\right]
+\end{align}
+where, $G$ is gravitational constant, $m$ is mass of the body, $r_{\text{eq}}$ is the equatorial radius of the body, $r$ is the distance to a point away from the body, $J_k$ is the $k^{\text{th}}$ zonal gravitational harmonic, $P_k$ is the $k^{\text{th}}$ order Legendre polynomial, and $\phi$ is the elevation angle of the vector tracking a point away from the body. The perturbing acceleration due to $J_2$ harmonics is given by
+
+\begin{align}
+\mathbf{a}_{J_2}=-\frac{3}{2}J_2\left(\frac{\mu_g}{r^2}\right)\left(\frac{r_{\text{eq}}}{r}\right)^2\left(\begin{array}{c}
+\left(1-5\left(\frac{z}{r}\right)^2\right)\frac{x}{r}\\
+\left(1-5\left(\frac{z}{r}\right)^2\right)\frac{y}{r}\\
+\left(3-5\left(\frac{z}{r}\right)^2\right)\frac{z}{r} \end{array}\right)
+\end{align}
+Eq. \eqref{eq:rddot} with $J_2$ takes the form
+\begin{gather}
+\mathbf{\ddot{r}}=-\frac{\mu_g}{r^3}\mathbf{r}+\mathbf{a}_{J_2}
+\end{gather}
+
+\subsubsection{Fourth-Order Runge Kutta Method}
+
+A Runge-Kutta fourth-order method is a numerical technique used to solve ordinary differential equations. The two-body equation in the previous section is a second-order differential equation that is difficult to solve analytically. Hence, Runge-Kutta methods are used to solve the two-body equation and obtain state solutions. This method uses the weighted average of four points defined by \cite{greenberg_advanced_1998}
+
+\begin{subequations}
+\begin{gather}
+\label{eq:range_kutta}
+\begin{aligned}
+k_1 &= hf(x_n,y_n)\\
+k_2 &= f(x_n+\frac{h}{2},y_n+\frac{1}{2}k_1)\\
+k_3 &= f(x_n+\frac{h}{2},y_n+\frac{1}{2}k_2)\\
+k_2 &= f(x_{n+1},y_n+k_3)
+\end{aligned}
+\end{gather}
+\end{subequations}
+
+where $h$ is the chosen step size, $n$ represents the current estimate and $n+1$ represents the updated estimate. A step size having approximate resolution should be chosen to avoid significant accumulation of error. The state update is given by
+\begin{align}
+y_{n+1}=y_n+\frac{1}{6}(k_1+2k_2+2k_3+k_4)
+\end{align}
+\section{Model}
+\label{model}
+
+\subsection{Planar Triangle Method}
+
+The planar triangular method and the spherical triangular methods are both pattern recognition algorithms for spacecraft attitude determination. Both these methods are extensions to the popular angle method. In this paper we will discuss only about the PTM. The details of the spherical triangular method can be found in Ref.~\citen{STM}. It is strongly encouraged to review Ref.~\citen{PTM} for a complete derivation of the planar triangle method. It has been determined by Cole that the planar triangle method yields similar performance to that of the spherical triangle method\cite{PTM}. Therefore, the planar triangle method is preferred over spherical triangle method due to reduced complexity and computational cost. Alike the spherical triangle method, the planar triangle method requires that there be at least three stars present in the FOV. This stems from the fact that the planar triangle method creates planar triangles from combinations of three stars. Again, it will be necessary to introduce pivoting with the planar triangle method to reduce multiple solutions.\\
+
+The PTM uses the stars/debris present in the FOV to form triangles, the area and polar moment of the triangles are then calculated. The catalog is then searched for matching areas and polar moments. If multiple matches are found then one of the vertex of the triangle is pivoted using another star. This process is continued until a single solution can be reached. The planar triangle method need a minimum of three stars in the debris in the FOV.
+
+\begin{figure}[t]
+\label{triangles_with_Stars}
+\centering
+\includegraphics[width = 0.8\textwidth]{Planar_Triangle}
+\caption{ Planar Triangles Formed with Three Stars}
+\end{figure}
+
+\subsubsection{Planar Triangle Properties}
+
+The two properties used by the PTM to identify the stars in the FOV are area and polar moment of the planar triangles. The area of the planar triangle can be given by the Herons formula as \cite{cole_fast_2006}.
+
+\begin{align}
+\label{herosformula}
+A_p = \sqrt{s(s-a)(s-b)(s-c)}
+\end{align}
+where, 
+\vspace{-1 cm}
+\begin{subequations}
+\begin{align}
+s &= \frac{1}{2}(a+b+c)\\
+a &= ||\hat{\textbf{v}_1} - \hat{\textbf{v}_2}||\\
+b &= ||\hat{\textbf{v}_2} - \hat{\textbf{v}_3}||\\
+c &= ||\hat{\textbf{v}_1} - \hat{\textbf{v}_3}||
+\end{align}
+\end{subequations}
+where $\hat{\textbf{v}}_i$ are the unit star vectors. A depiction of the planar triangle between three star unit vectors is shown in Fig.~\ref{triangles_with_Stars}. In practice,
+the three unit position vectors contain sensor error. Therefore, an expression for the standard
+deviation of the planar triangle area is desired. Since \crefname{equation}{Eq.}{Eqs.}\cref{herosformula} is nonlinear, a linearization
+technique is used to extract the variance of the area. Hence, a equation for the standard deviation for the area of the planar triangles needed. This variance is computed by,
+\begin{align}
+\sigma^2_{A_{P}} = H_p R H^{T}_p \label{area_covar}
+\end{align}
+the standard deviation is then given by
+\begin{align}
+\sigma_{A_{p}} = \sqrt{\sigma^2_{A{p}}} \label{area_STD}
+\end{align}
+
+The [1$\times$9] partial derivative of $\textbf{H}_p$ is given by:
+
+\begin{subequations}
+\begin{align}
+H_p =
+\begin{bmatrix}
+\textbf{h}_{p1}^{T} & \textbf{h}_{p2}^{T} & \textbf{h}_{p3}^{T}
+\end{bmatrix} \\
+\textbf{h}_{p1}^{T} = \frac{\partial A_p}{\partial a}\frac{\partial a}{\partial \hat{\textbf{v}_1}} + \frac{\partial A_p}{\partial c}\frac{\partial c}{\partial \hat{\textbf{v}_1}}\\
+\textbf{h}_{p2}^{T} = \frac{\partial A_p}{\partial a}\frac{\partial a}{\partial \hat{\textbf{v}_2}} + \frac{\partial A_p}{\partial b}\frac{\partial b}{\partial \hat{\textbf{v}_2}}\\
+\textbf{h}_{p3}^{T} = \frac{\partial A_p}{\partial b}\frac{\partial b}{\partial \hat{\textbf{v}_3}} + \frac{\partial A_p}{\partial c}\frac{\partial c}{\partial \hat{\textbf{v}_3}}\\
+\end{align}
+\end{subequations}
+
+The partials in the above equation are computed from,
+\begin{subequations}
+\begin{align}
+\frac{\partial A_p}{\partial a} &= \frac{u_1-u_2+u_3+u_4}{4A_p}\\
+\frac{\partial A_p}{\partial b} &= \frac{u_1+u_2-u_3+u_4}{4A_p}\\
+\frac{\partial A_p}{\partial c} &= \frac{u_1+u_2+u_3-u_4}{4A_p}\\
+\frac{\partial a}{\partial \hat{\textbf{v}_1}} &= \frac{(\hat{\textbf{v}_1}- {\hat{\textbf{v}_2}})^T}{a}\\
+\frac{\partial b}{\partial \hat{\textbf{v}_2}}&= \frac{(\hat{\textbf{v}_2}- {\hat{\textbf{v}_3}})^T}{b}\\
+\frac{\partial c}{\partial \hat{\textbf{v}_3}} &= \frac{(\hat{\textbf{v}_1}- {\hat{\textbf{v}_3}})^T}{c}\\
+\frac{\partial a}{\hat{\textbf{v}_2}} &= - \frac{\partial a}{\partial \hat{\textbf{v}_1}}\\
+\frac{\partial b}{\hat{\textbf{v}_3}} &= - \frac{\partial b}{\partial \hat{\textbf{v}_2}}\\
+\frac{\partial c}{\hat{\textbf{v}_3}} &= - \frac{\partial c}{\partial \hat{\textbf{v}_1}}\\
+\end{align}
+\end{subequations}
+where,
+\begin{subequations}
+\begin{align}
+u_1 &= (s-a)(s-b)(s-c)\\
+u_2 &= s(s-b)(s-c)\\
+u_3 &= s(s-a)(s-c)\\
+u_4 &= s(s-a)(s-b)
+\end{align}
+\end{subequations}
+The matrix $R$ is a covariance of all unit star vectors on the diagonal, it is given by Ref.\citen{silversmith}:
+
+
+\begin{align}
+R = 
+\begin{bmatrix}
+ R_1 & 0_{3\times3} & 0_{3\times3}\\
+ 0_{3\times3} & R_2 & 0_{3\times3}\\
+ 0_{3\times3} & 0_{3\times3} & R_3
+\end{bmatrix}
+\end{align}
+where, $\textbf{R}_1$,  $\textbf{R}_2$, and $\textbf{R}_3$ are the covariance matrices for unit star vectors $\hat{\textbf{v}}_1$, $\hat{\textbf{v}}_2$, and $\hat{\textbf{v}}_3$ respectively.
+The matrix, $\textbf{0}_{3 \times 3}$, is a [3 $\times$ 3] matrix populated with zeros. The polar moment is introduced as
+a supplement to the area because even if two planar triangles have the same area, their polar moments are most likely different. The reverse is also true, if two planar triangles have the same polar moments, it is likely that their areas are not equal. This helps differentiate further between sets of planar triangle combinations within the FOV. The polar moment of the planar triangle is give by the expression,
+\begin{align}
+J_p = \frac{A_p(a^2+b^2+c^2)}{36}
+\end{align}
+
+Again, since the unit star vectors contain sensor error, an expression for the standard deviation of the polar moment is obtained through linearization. The polar moment variance is given by:
+
+\begin{align}
+\sigma^2_{J_{p}} = \bar{H}_p R \bar{H}^T_p  \label{polar_covar}
+\end{align}
+and therefore the standard deviation is 
+\begin{align}
+\sigma_{J_{p}} = \sqrt{\sigma_{J_{p}}^2}\label{polar_STD} 
+\end{align}
+
+The partial derivative matrix, 
+
+\begin{subequations}
+\begin{align}
+\bar{\textbf{H}_p} &= 
+\begin{bmatrix}
+\bar{\textbf{h}}^T_{p1} & \bar{\textbf{h}}^T_{p2}& \bar{\textbf{h}}^T_{p3}
+\end{bmatrix}\\
+\bar{\textbf{h}}^T_{p1} &= \frac{\partial J_p}{\partial a} \frac{\partial a}{\partial{\hat{\textbf{v}_1}}} + \frac{\partial J_p}{\partial c} \frac{\partial c}{\partial {\hat{\textbf{v}_1}}} + \frac{\partial J_p}{\partial A_p}  \textbf{h}^T_{p1}\\
+\bar{\textbf{h}}^T_{p2} &= \frac{\partial J_p}{\partial a} \frac{\partial a}{\partial{\hat{\textbf{v}_2}}} + \frac{\partial J_p}{\partial b} \frac{\partial b}{\partial {\hat{\textbf{v}_2}}} + \frac{\partial J_p}{\partial A_p}  \textbf{h}^T_{p2}\\
+\bar{\textbf{h}}^T_{p3} &= \frac{\partial J_p}{\partial b} \frac{\partial b}{\partial{\hat{\textbf{v}_3}}} + \frac{\partial J_p}{\partial c} \frac{\partial c}{\partial {\hat{\textbf{v}_3}}} + \frac{\partial J_p}{\partial A_p}  \textbf{h}^T_{p3}
+\end{align}
+\end{subequations}
+in this work the PTM is used for RSO identification. The process is the same as star identification, but the stars are replaced with RSOs. The catalog for the RSOs is obtained from the two line element format. The reader would benefit by reviewing Ref.~\citen{silversmith,cole_fast_2006} for details on the catalog  and the \textit{k}-vector method. The \textit{k}-vector method is constructed to enable easy access to the quite extensive catalog by representing the parabolic relationship between the planar triangles identifier and the planar triangle area \cite{cole_fast_2006,PTM}.\\
+
+\subsection{Data Association}
+The gating technique is a method of eliminating an unlikely observation from entering a track update. These methods help keep away any  undesirable observation that might be made. A simple example of a gating method is that of a house with an automatic gate that opens only when the identity of the person at the gate can be verified, if the identity cannot be verified then the person does not have access. Similarly, validation gates do not let the update of observations if the observation does not belong to the measurement space.\\
+
+A gate is formed about the predicted measurement and all observations that fall within the gate are considered for the track update. The manner in which the observations are actually chosen to update the track depends on the data association method in use. The gating methods are useful for reducing complexity and increasing computational efficiency. \\
+
+According to \cite{crassidis_optimal_2011} the position of a RSO can be represented by
+\begin{align*}
+\tilde{\textbf{y}} = \textbf{y} + \textbf{v} \\
+\tilde{\textbf{y}} = \hat{\textbf{y}} + \textbf{e}
+\end{align*}
+where $\textbf{y}$ is the true vector, $\hat{\textbf{y}}$ is the estimated vector, $\textbf{e}$ is the residual error and $\textbf{v}$ is Gaussian noise. The measurement vector is also mathematically represented by
+\begin{align}
+\label{MsmtEqn}
+\textbf{y} = H\textbf{x}(k) + \textbf{v}(k)
+\end{align}
+where $H(\textbf{x})$ is a linear or non-linear function of the targets state $\textbf{x}$ and $\textbf{v}$ is a zero mean Gaussian measurement noise with covariance matrix $R$.\\
+
+Now we define $\tilde{\textbf{y}}$ the residual vector, which is the difference between the actual \textbf{y} and the expected $\hat{\textbf{y}}$ measurement vectors. For the scan \textit{k} or for the $k^{\text{th}}$ scan, the residual vector is represented as
+\begin{align}
+\label{ResidualError}
+\tilde{\textbf{y}}(k) = \textbf{y}(k) - H\hat{\textbf{x}}(k|k-1) 
+\end{align}
+In Eq. \eqref{ResidualError} , the residual covariance matrix is defined to be $S = HPH^T + R$ where $P$ is the one step prediction covariance matrix.
+
+\subsubsection{Elliptical Gates}
+
+The Mahalanobis distance is synonymous to the ellipsoidal gate. This is a statistical tool used to measure the distance between points in multivariate data. This distance measure is also the distance between a point \textit{P} and a distribution \textit{D}. The Mahalanobis distance was originally developed for use with multivariate normal distributed data.\\
+
+A prediction ellipse is a region for predicting the location of a new observation under the assumption that the population is bivariate normal. For example, an $80\%$ prediction ellipse indicates a region that would contain about $80\%$ of a new sample that is drawn from a bivariate normal population with mean and covariance matrices that are equal to the sample estimates.\\
+
+The Mahalanobis distance is also said to be the simple Euclidean distance which takes into account the covariance of the data. If the covariance of the data is an identity matrix then the Mahalnobis distance is nothing but the Euclidean distance. The Mahalnobis distance measure is mathematically written as
+\begin{align}
+\label{eq:Mahal}
+d = \sqrt{\tilde{\textbf{y}}^TS^{-1}\tilde{\textbf{y}}}
+\end{align}
+The Mahalanobis distance from \crefname{equation}{Eq.}{Eqs.}\cref{eq:Mahal} represents the general arbitrarily oriented ellipsoid. A ellipsoid with center at \textbf{v} is defined by solutions to \textbf{x} to the equation
+\begin{align}
+\label{eq:ellipse}
+(\textbf{x}-\textbf{v})^{T}A(\textbf{x}-\textbf{v})  = 1
+\end{align}
+
+The equation of an ellipse given by \cref{eq:ellipse} and the Mahalanobis distance are identical in form, and hence the Mahalanobis distance is often referred to as either \textit{elliptical gates} or \textit{ellipsoidal gates}.\\
+
+In the simplest of terms the Mahalanobis distance is a powerful method of measuring how similar some set of conditions is to an ideal set of conditions. This is precisely what is desired by us, as we want to see how similar a point in space is to all true points in the catalog.\\
+
+Unlike the Euclidean distance the Mahalanobis distance takes into account the following facts \cite{giorgio_grisetti_robotics}
+\begin{itemize}
+
+\item It accounts for the fact that the variance in each direction are different
+
+\item It accounts for the covariance between variables
+
+\item It reduces to the Euclidean distance for uncorrelated variables and unit variance
+\end{itemize}
+Then the measurement area is given by
+\begin{align*}
+V(k,\gamma) &=  \lbrace y: (y-\hat{y})^T\hat{S}^{-1}(y - \hat{y}) \leq \gamma\rbrace \\
+&=\lbrace y : d^2 \leq \gamma \rbrace
+\end{align*}
+The probability of a correct match is defined by the gate threshold $\gamma$. This area is called the validation gate and the threshold value for $\gamma$ can be obtained from the inverse $\chi^2$ cumulative distribution~\cite{giorgio_grisetti_robotics}.\\
+
+The Mahalanobis  distance takes into account factors like position, uncertainty and correlations of the measurements. Therefore it can be an effective tool if used wisely in the case of RSO identification. The Mahalanobis distance will be used as a tool for gating and data association. It will also be shown that elliptical gates will be used to increase the performance of planar triangular methods. This distance can be combined with algorithms such as the nearest neighbor to identify closest neighbors in a multivariate data set.\\
+
+The nearest neighbor maintains the single most likely hypothesis, it is the simplest and the most widely applied data association method. The fundamental concept of the nearest neighbor is to associate the most likely assignment of an observation to its existing track. This association is attained by verifying if the observation lies in the validation gate and it is the closest measurement to the existing track. The nearest neighbor in the validation gate region is then assigned to the existing track, and this is updated.\\
+
+The nearest neighbor algorithm can be used with various types of distances (Euclidean, city block, Chebyshev, etc). The most popular among these is the Mahalanobis distance or the ellipsoidal gate described in this section. We use a gate  size as mentioned previously. This is gate given by
+\begin{align}
+\label{NNEqn}
+G_{r} = \lbrace \textbf{z} : D(\textbf{z})\leq\gamma \rbrace
+\end{align}
+where, $D$(\textbf{z}) is the distance measure. In our case we use the Mahalanobis distance as a distance measure. Also, \textbf{z} is a track measurement, is determined by propagating the state model of the target through a state estimator such as a Kalman filter. The track measurements are updated through the nearest neighbor measurement can be written as
+\begin{align}
+\label{NNEqn}
+G_{r} = \lbrace \textbf{z} : D(\textbf{z})\leq\gamma \rbrace
+\end{align}
+where, $D$(\textbf{z}) is the distance measure. In our case we use the Mahalanobis distance as a distance measure. Also, \textbf{z} is a track measurement, is determined by propagating the state model of the target through a state estimator such as a Kalman filter. The track measurements are updated through the nearest neighbor measurement given by:\\
+\begin{align}
+\textbf{z}^{*}(k) = \underset{\textbf{argmin}{j}} D_{ij}(\textbf{z}), j= 1,2,.....,n_{v}
+\end{align}
+where, $n_v$ is the number of measurements. Application of nearest neighbor for RSO identification when measurement vector is available involves finding all the neighbors for this measurement. This measured value is then associated to the nearest true vector in the data. This simple form of data association will be used for associating a single object to its true object. This NN approach can be implemented by the following algorithm.
+  \begin{enumerate}
+\item Compute Mahalanobis distance to all measurements
+\item Accept the closest measurement
+\item Update the match as if it were the correct measurement
+\end{enumerate}
+
+\section{Simulation}
+
+To simulate realistic conditions we have used the data from infamous incident of the Chinese government intentionally destroying the Fengyun 1C satellite; this satellite was destroyed in  an attempt to test their anti-satellite weapons program.  The Chinese weather satellite was launched into a Sun-synchronous orbit with a mean altitude of 850 km and an inclination of 98.8 degrees \cite{johnson_characteristics_2008}. The 2000 pieces of debris data of the Fengyun 1C available on www.celestrak.com. Another 2000 pieces of debris were simulated due to debris not being  being visible from the chosen site \cite{silversmith}. The details of the simulated debris can be found in \cite{silversmith}.\\
+
+\begin{figure}[h]
+\centering
+\includegraphics[width= 0.6\textwidth]{2lineelement}
+\caption{The Two Line Element Format; source NASA}
+\label{TLE}
+\end{figure}
+
+\subsection{The Site and Fengyun 1C}
+
+The Ground-based Electro-Optical Deep Space Surveillance (GEODSS) instrument is located at the White Sands Missile Range in New Mexico. The location of the telescope is $32.82^{\circ}$ latitude, $-106.66^{\circ}$ longitude and 1.250 (km) altitude \cite{silversmith}. We use this location for the purpose of simulations.
+The data for the debris is provided in the two-line element format which provides the position/velocity as Keplerian elements in Figure~\ref{TLE}. For the purpose of this work, the first 2000 objects listed on celestrak.com have been chosen for analysis. Since there is no instance of time in which a significant amount of Fengyun 1C debris are within the view of the chosen site, this set of data has been augmented with an additional 2000 simulated objects. The simulated objects are normally distributed about the piece of Fengyun 1C debris that has the smallest separation angle w.r.t. the normal vector of the site at a specific
+time. This provides a distribution of 2000 simulated objects in which the majority are within view of the site. In total, there are 4000 RSOs that are cataloged and roughly 2000 of those are in view of the site.\\
+
+
+The data from the two line element format is extracted and the data is converted to the ECI coordinate system, results are shown in Figure~\ref{ECIDebris_1}. The ECI initial debris data is then propagated to obtain an instance of time in which there is an acceptable amount of debris visible to the site \cite{silversmith}. The time instance chosen is $t = 1540$ min. Then the debris is converted to the ECEF coordinate system. The reader is recommended to review Ref.~\citen{silversmith} (chapter 5), for details of the simulations required to generate the RSO. To see RSOs in the FOV the transformation from ECEF to ENU to the INSTR (Instrument Frame) is essential.\\
+
+\begin{figure}[h]
+\centering
+\includegraphics[width = 0.6\textwidth]{debris_eci_extract_01}
+\caption{Debris in ECI Coordinate System; source Ref.\citen{silversmith}}
+\label{ECIDebris_1}
+\end{figure}
+
+\subsection{Planar Triangle Method Algorithm}
+
+The PTM code execution can be seen in Ref. \citen{PTM}. However  a broad overview of the steps can be given as follows:
+
+\begin{enumerate}
+\item Create Spherical Quad-Tree Structure
+\item Catalog Planar Triangles
+\item Add Planar Triangle Properties
+\item Sort Planar Triangles
+\item Run Pattern Recognition Algorithm in a Monte Carlo Regime
+\end{enumerate}
+
+The first step in the PTM code execution is to create a multi-level spherical quad-tree structure. Then, based on an RSO's position data, it is stored within that
+structure. Once all RSOs have been assigned a position in the quad-tree structure, the planar
+triangle properties are computed and associated with that quad-tree structure location. To increase
+efficiency further, a binary tree was implemented to sort the planar triangle properties according to
+the value of the planar triangle area. The ultimate goal is to provide an efficient storing mechanism that can be used o quickly identify an RSO based on planar triangle area and polar moment.\\
+
+Once the storing mechanism (steps 1-4) has been constructed, it can now be used to compare focal plane observations to RSOs stored in a catalog. A Monte Carlo regime was used to test the planar triangle method. At each iteration, a random telescope boresight is generated and an associated random INSTR frame is constructed. From this INSTR frame, all RSOs within the FOV are input to the pattern recognition algorithm. This sequence is repeated many times in
+order to accumulate a large result set. A representation of the pattern recognition algorithm is as follows:\\
+
+\textbf{for} i= 1 to number of desired iterations \textbf{do}
+
+\begin{itemize}
+\item Compute random boresight vector
+\item Compute random INSTR frame with $\hat{\textbf{t}}_z$ aligned with boresight vector
+\item Determine RSOs in FOV
+Peform ENU to INSTR coordinate system transformation
+\item Compute focal plane observations
+\item Add sensor error to focal plane observations
+\item Compute measured RSO position vectors with both measurement and sensor error
+\item Compute planar triangle properties
+\item Compute area variance
+\item Compute polar moment variance
+\item Compare computed values with catalog and determine matching RSOs
+\end{itemize}
+
+
+
+
+The first step in the algorithm is to compute a random boresight vector. This represents a random
+telescope boresight which is restricted to the physical attributes of the space surveillance telescope. The telescope is restricted to an elevation angle of 20 degrees above the
+horizon and an azimuth angle that spans the entire plane. Therefore the random boresight vectors
+are uniformly distributed within these boundaries. A sample of 10 uniformly distributed boresight can be seen in \cref{RAT}. The ransom boresight vector can be computed as:
+
+\begin{subequations}
+\begin{align}
+ elev &= \frac{\pi}{9} +\big[\frac{\pi}{2} -\frac{\pi}{9} \big] rand(1)\\
+ az &= 2\pi rand(1)\\
+ \hat{r}_b &=  \begin{bmatrix}
+  cos(elev) ~cos(az)\\
+  cos(elev) ~sin(az)\\
+  sin(az) 
+ \end{bmatrix} \label{subeqnc}
+\end{align}
+\end{subequations}
+
+In the above equation, $elev$ and $az$ are the elevation angle and azimuth angle respectively. The function rand(row, col) is a $[row \times col]$ uniform random number generator. The random INSTR frame is then constructed with the $\hat{t}_z$ axis aligned with the current boresight vector. Therefore, the INSTR frame can be constructed by,
+
+\begin{subequations}
+\begin{align}
+\hat{\textbf{t}}_z &= \hat{\textbf{r}}_b\\
+\hat{\textbf{t}}^{'}_y &= \hat{\textbf{t}}_z \times \hat{\textbf{r}}^{'}_b\\
+\hat{\textbf{t}}_y & = \frac{\hat{\textbf{t}}_z \times \hat{\textbf{t}}^{'}_y}{||\hat{\textbf{t}}_z \times \hat{\textbf{t}}^{'}_y||}\\
+\hat{\textbf{t}}_z &= \frac{\hat{\textbf{t}}_y \times \hat{\textbf{t}}_z}{ || \hat{\textbf{t}}_y \times \hat{\textbf{t}}_z ||}\\
+\end{align}
+\end{subequations}
+where, $\hat{\textbf{r}}^{'}_b$
+is a separate random vector generated from Eq.\eqref{subeqnc}, and $\hat{\textbf{t}}^{'}_y$
+is a temporary y-axis
+used to generate the orthogonality condition between $\hat{\textbf{t}}_z$ and $\hat{\textbf{t}}_y$. As mentioned previously, the
+specific orientation of the $\hat{\textbf{t}}_{xy}$ plane is non-significant as long as $\hat{\textbf{t}}_z$ is along the boresight vector.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width = 0.6\textwidth]{Random_boresight_vec.PNG}
+\caption{Random Boresight Vectors Generated for Random Attitude Test; source Ref.\citen{silversmith}}
+\label{RAT}
+\end{figure}
+
+To determine whether or not an RSO is within the FOV is quite simple. The 6 degree field
+of view is represented by a plane at the end point of the random boresight vector, the 6 degree field of view can be seen by:
+
+\begin{align}
+\arccos(\hat{\textbf{r}}_{rso}, \hat{\textbf{r}}_b ) \leq \frac{3\pi}{180} \label{FOV_calculate}
+\end{align} 
+
+ \begin{figure}[h]
+\centering
+\includegraphics[width = 0.6\textwidth]{Sample_FOV_OBS.PNG}
+\caption{Field of View and Focal Plane Observations; source Ref.\citen{silversmith}}
+\label{FOV}
+\end{figure}
+
+The equations for computing the planar triangle area and polar moment standard deviations are given in \crefname{equation}{Eq.}{Eqs.}\cref{area_STD,polar_STD}. However, the covariance matrix used in these equations must be substituted with the combined covariance, $\textbf{R}_{comb}$. Therefore, R would be replaced
+by,
+
+\begin{align}
+\textbf{R}_{comb} = 
+\begin{bmatrix}
+\textbf{R}_{comb1} & 0_{3 \times 3} & 0_{3 \times 3}\\
+0_{3 \times 3} & \textbf{R}_{comb2}  & 0_{3 \times 3}\\
+0_{3 \times 3} & 0_{3 \times 3} & \textbf{R}_{comb3}
+\end{bmatrix}
+\end{align}
+this leads to the standard deviation of the area and polar moment in the presence of sensor and measurement error.\\
+
+\subsection{Execution of PTM}
+
+Now, for the purpose of simulation we generate 1000 random boresight vectors. The debris is FOV can be calculated by using  \crefname{equation}{Eq.}{Eqs.}\cref{FOV_calculate}. The RSOs in the FOV for each boresight vector are calculated and when the RSOs in FOV are more than the minimum number desired, the PTM will be executed. Three Monte Carlo runs of random attitude tests (RATs) is performed- each monte carlo run consists of 1000 RATs, and this monte carlo simulation is done three times for every case of measurement error. An illustration of the random boresight vectors computed with the debris can be seen in \cref{3D_FOV}, this gives a clear understanding of how the boresight vectors are generated and also helps visualize the RSOs that are in the field of view. In \cref{3D_FOV} the red dots are the debris in space, the blue straight lines pointing up towards the debris are the boresight vectors of the telescope, the blue lines at the base of the boresight vectors shows the other two axes of each boresight vector, the blue circular head on top of each boresight vector is the field of view for that particular telescope boresight and the light pink triangles are the planar triangles formed between the debris pieces in space.\\
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{Multiple_FoV_3d_2.png}
+\caption{Random Attitude Tests with Debris}
+\label{3D_FOV}
+\end{figure}
+
+For the purpose of simulations we predominantly use 7 cases of measurement errors. These measurement error are listed below.
+
+\begin{table}
+\centering
+\begin{tabular}[\textwidth]{|c|c|c|c|c|c|c|c|}
+\hline
+Iteration no. & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$\\
+\hline
+$3\sigma$~errors & $10^{-20}$ & $0.06$ & $0.12$ & $0.24$ & $0.3$ & $0.6$ & $0.9$\\
+\hline
+\end{tabular}
+\caption{Measurement Errors}
+\end{table}
+
+
+\subsection{Gating Approach}\label{gating}
+The method of gating also involves the data association method and also sorting the results obtained from this method. A random attitude test is executed along with the execution of the elliptical gates for all debris in FOV. It can be seen from \cref{debrisInFOV} the number of debris visible to the ground site. We use elliptical gating, i.e. the Mahalanobis distance between each measured observation and all its true positions are found. Then we use the nearest neighbor  algorithm to associate the closest measured value to the true debris. Once this association is done, a check is performed to see if the matched pieces of debris are the same. If both the measured and truth are the same then we have a correct match and we increment the truth counter, else we increment the bad/fail counter.  This is the process used for simulation of the gating approach.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{FOV1.png}
+\caption{The Debris in the FOV}
+\label{debrisInFOV}
+\end{figure}
+
+\subsection{Clutter the FOV to Test Gating and PTM}
+
+Since the gating method performs exceptionally well in cases where the FOV is very lightly dense, we decided to push the system and test it for cases where the FOV is very dense and is cluttered with debris pieces. A function is used to artificially add pieces of debris in the FOV. \\
+
+To add closely spaced debris we have taken the pairwise distance between each piece of debris in the FOV. This is done by using matlab functions such as pdist2. Once the pairwise distance with respect to every piece of debris is found, the minimum distance in each case is taken and used it as the $3\sigma$ (standard deviation) to generate $3$ pieces of debris around each already existing debris to populate the FOV as shown in \cref{clutter}.\\
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{clutter3_gates}
+\caption{Adding 3 Pieces of Debris Around Each Existing Piece to Clutter the Environment}
+\label{clutter}
+\end{figure}
+Once the addition of debris is done, the simple elliptical gating approach mentioned in Section. \ref{gating} is used for the debris matching and the results are saved accordingly.\\
+
+\section{Planar Triangular Method Coupled with Gating Approach}
+
+This method couples the working of the PTM and the gating method. First the gating method is executed as a precursor to the PTM. Here, we use the gating method to associate the measured data to the truth data under varying measurement errors. Once this measured data is associated to the truth, the PTM is executed using the updated track values, i.e.~the PTM will use the truth values that have been associated to their corresponding measured. This helps the PTM to compare debris pieces that are already associated to the truth and if in case there is a mismatch or wrong allocation during the gating process the PTM makes sure that all mis-associations are re-identified with their true corresponding identity by using planar triangle properties for correct association. Hence, it can be said that this method is precise and robust as well. Once the PTM is executed the results obtained are saved for each and every run. It can be seen that this method increases the efficiency of the PTM. The results obtained in each of these cases will be seen in the following section, where the results will be discussed in detail.
+
+\section{Results}
+
+The purpose of this work is to prove that the accuracy of the PTM can be improved by using elliptical gates to as a screening method to associate the measured observation to the truth. A comprehensive study has also been performed on using just the gating approach for data association.\\ 
+
+During the study it was found that a simple gating approach works well in cases where the FOV is not cluttered with debris. The simple gating approach for an uncluttered FOV proves to have a better performance under varying measurement errors in the debris position, when compared to the PTM. Figure \ref{GatingVsPTM} shows the accuracy of the gating method compared to the PTM. The x-axis in \cref{GatingVsPTM} has the run number and the \cref{map} maps the run number to the corresponding measurement error for each case.\\
+\begin{figure}[h]
+\centering
+\includegraphics[width = 0.6\textwidth]{gatingVsPTM}
+\caption{Accuracy of the Gating Methods Compared to the PTM in an Uncluttered FOV}
+\label{GatingVsPTM}
+\end{figure}
+
+\begin{table}
+\begin{tabular}[0.4\textwidth]{|p{0.9cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|p{0.45cm}|}
+\hline
+Run no. & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ & $8$ & $9$ & $10$ & $11$ & $12$ & $13$ & $14$ & $15$ & $16$ & $17$\\
+\hline
+Meas. error & $10^{-20}$ & $10^{-20}$ & $10^{-20}$ & $0.06$ & $0.06$ & $0.06$ & $0.12$& $0.12$& $0.12$ & $0.24$& $0.24$& $0.24$ & $0.3$ &  $0.3$ & $0.3$ &$0.6$& $0.6$\\
+\hline 
+\end{tabular}
+\caption{x-Axis Run Number and Corresponding Measurement Error}\label{map}
+\end{table}
+
+The performance of ellipsoidal gating methods is also studied in a cluttered environment. As expected the accuracy of the gating method drops drastically to an average detection accuracy of about less than $50\%$,  when the FOV is cluttered and there are many debris pieces very close to each other. The $x$-axis in the graph below shows the $3-\sigma$ measurement error and the $y$-axis shows the accuracy of the system. It can be seen from the graph in \cref{gatingInClutter} that the gating method performs very poorly in a cluttered environment.\\
+
+\begin{figure}[h]
+\centering
+\includegraphics[width= 0.6\textwidth]{gatingInClutter}
+\caption{Accuracy of the Gating Method in a Cluttered Environment}
+\label{gatingInClutter}
+\end{figure}
+
+A study is also performed on the performance of the PTM in a cluttered FOV, where many debris are in very close vicinity to each other. \Cref{PTMInClutter} shows the performance of the PTM against that of the gating method in a cluttered environment. It can be seen that the PTM outperforms the gating method in a cluttered environment. This tells us that the performance of the PTM is effected more by the measurement error than that of a cluttered environment.\\
+
+\begin{figure}[h]
+\centering
+\includegraphics[width= 0.6\textwidth]{PTMInClutter}
+\caption{Comparision of PTM with the Gating Method for Varying Measurement Errors}
+\label{PTMInClutter}
+\end{figure}
+
+Since it is clear that the gating method cannot be used as a standalone method for space object identification, it is to be seen if the gating method can be used as a precursor to the PTM; i.e. to associate the measured observation to its truth using a gating approach. When this gating method is performed before the PTM, it can be seen that the precursory gating method helps enhance the performance of the PTM. The results shown in \cref{PTMWithGate} shows clear improvement of performance of the new method to that of the previously existing PTM.\\
+
+\begin{figure}[h]
+\centering
+\includegraphics[width= 0.6\textwidth]{PTMWithGate}
+\caption{Performance Comparison Between PTM and PTM with Elliptical Gates}
+\label{PTMWithGate}
+\end{figure}
+
+It can be seen that the PTM with gates performs better than the PTM. The PTM with gates shows an improvement of about $10 \%$. To show that our new system performance is statistically significant we performed a hypothesis testing. In this method it is found that the null hypothesis shows the methods are identical in performance at the $99\%$ confidence interval.\\
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{PTMWithGate2}
+\caption{Performance Comparison Between PTM and PTM with Elliptical Gates}
+\label{PTMWithGate2}
+\end{figure}
+
+On performing the hypothesis testing, the null hypothesis was rejected. This confirms our assumption that the application of gating to the PTM helps enhance the performance of the PTM. Therefore we can state that the systems performance did improve. \\
+ 
+\subsection{T Test}
+
+We conducted a Paired-sample t-test to compare the mean accuracy of the Planar Triangular Method versus Planar Triangular Method with Gates using the IBM SPSS 19 Statistical Software. There was a significant difference between the accuracy of Planar Triangular Method with Gates (M=91.32, S.D=13.164) and Planar Triangular Method (M=83.52, S.D=13.841) with t=11.415 at p=0.01. Therefore, we conclude that Planar Triangular Method with Gates is 7.801\% (M.D=7.801, S.D=2.899) more accurate than Planar Triangular Method with a 99\% confidence interval.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\toprule
+ & Mean & N & Std. Deviation & Std. Error Mean\\ \hline
+PTM Gate & 91.32 & 18 & 13.164 & 3.103\\
+PTM & 83.52 & 18 & 13.841 & 3.262\\  
+\bottomrule
+\end{tabular}%
+\caption{Paired Samples Statistics}
+\label{table:PS_Statistics}%
+\end{table}%
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\toprule
+ & N & Correlation & Sig\\ \hline
+PTM Gate \& PTM & 18 & 0.978 & 0.000\\ 
+\bottomrule
+\end{tabular}%
+\caption{Paired Samples Correlations}
+\label{table:PS_Correlations}%
+\end{table}%
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\toprule
+ & \multicolumn{5}{|c|}{Paired Differences} & & &\\ \cline{2-6}
+ & & & & \multicolumn{2}{|c|}{99 \% Confidence Interval} & & &\\
+ & &  Std.  & Std.  & \multicolumn{2}{|c|}{of the Difference} & & & Sig.\\ \cline{5-6}
+ & Mean & Deviation & Error Mean & Lower & Upper & t & df & (2-tailed) \\ \cline{1-9}
+PTM Gate-PTM & 7.801 & 2.899 & 0.683 & 5.820 & 9.782 & 11.415 & 17    & 0.000 \\
+\bottomrule
+\end{tabular}%
+\caption{Paired Samples Test}
+\label{tab:PS test}%
+\end{table}%
+
+
+\section{Conclusion}
+
+This thesis extends the concepts of using ellipsoidal validation gates to data association and pattern recognition algorithms like the planar triangle method (PTM). The proposed method of using a ellipsoidal gating as a precursory to the PTM shows improvement in accuracy of objects being correctly identified when compared to the PTM alone. This method is simple in implementation,but the results show a consequential improvement ranging anywhere from 5\% to 10\% depending on the measurement errors involved.\\
+
+The main focus has been on the application of gating and its contribution to improving data association and pattern recognition methods. Even though initially the gating approach shows a good performance as a stand alone method for data association. In depth analysis shows that the performance of gating as a stand alone method for data association does not show promising results due to its sensitivity to number of objects and the closeness associated with it. This means that  the performance of the gating approach starts to degrade as the number of objects in the field of view start to increase. This inability to accurately identify RSO in a clutter proves to be a major problem in real life scenarios. In case of the PTM it can be said that the method is insensitive to the number of objects in the field of view i.e. no significant drop in performance is noticeable due to increase in number of objects. However, it must be said that the PTM does show degrading results when the measurement error in position of the RSO does increase.\\
+
+It is clear from the hypothesis testing that our method works efficiently and also increases the accuracy of the already existing PTM method by an average of 7.801\%. This percentage of increment in accuracy has proven to be statistically significant in the 99\% confidence interval.
+
+
+
+
+\bibliographystyle{aiaa}
+\bibliography{AIAA-SSA}
+
+\section*{Appendix}
+\subsection{Results of PTM and PTM with Gates}
+
+% Table generated by Excel2LaTeX from sheet 'Sheet3'
+\begin{table}[h!]
+  \centering
+     \begin{tabular}{|c|c|c|c|}
+    \toprule
+    Fail(\%)  & Inconclusive(\%) & Bad(\%)   & Correct(\%) \\
+    \midrule
+    5.1   & 0     & 1     & 93.8 \\
+    4.2   & 0     & 1.2   & 94.5 \\
+    5.2   & 0     & 0.5   & 94.2 \\
+    6.1   & 0     & 0.7   & 93.1 \\
+    5.3   & 0     & 0.2   & 94.4 \\
+    6.3   & 0     & 0.2   & 93.4 \\
+    7.7   & 0     & 0.4   & 91.8 \\
+    8.9   & 0     & 0.6   & 90.4 \\
+    8.4   & 0     & 0.8   & 90.7 \\
+    13    & 0     & 1.2   & 85.7 \\
+    11.1  & 0     & 1.9   & 86.9 \\
+    11.1  & 0     & 1.8   & 87 \\
+    17.6  & 0     & 2.7   & 79.6 \\
+    15.9  & 0     & 2.1   & 81.9 \\
+    17.8  & 0     & 2.4   & 79.7 \\
+    40.6  & 0     & 2.2   & 57.1 \\
+    44.8  & 0     & 2.6   & 52.5 \\
+    40.7  & 0     & 2.5   & 56.7 \\
+        \bottomrule
+    \end{tabular}%
+     \caption{PTM Method}
+  \label{tab:addlabel}%
+\end{table}%
+
+\begin{table}[h!]
+  \centering
+
+    \begin{tabular}{|c|c|c|c|}
+    \toprule
+    Fail(\%)  & Inconclusive(\%) & Bad(\%)   & Correct(\%) \\
+    \midrule
+    0.00  & 0.00  & 0.00  & 100.00 \\
+    0.00  & 0.00  & 0.00  & 100.00 \\
+    0.00  & 0.00  & 0.00  & 100.00 \\
+    0.00  & 0.00  & 0.00  & 100.00 \\
+    0.00  & 0.00  & 0.00  & 100.00 \\
+    2.02  & 0.00  & 0.00  & 97.98 \\
+    1.01  & 0.00  & 0.00  & 98.99 \\
+    1.01  & 0.00  & 0.00  & 98.99 \\
+    2.02  & 0.00  & 0.00  & 97.98 \\
+    50.51 & 0.00  & 0.00  & 94.90 \\
+    59.60 & 0.00  & 0.00  & 94.00 \\
+    67.68 & 0.00  & 0.00  & 93.20 \\
+    9.09  & 0.00  & 0.00  & 90.91 \\
+    8.08  & 0.00  & 0.00  & 91.92 \\
+    6.06  & 0.00  & 0.00  & 93.94 \\
+    40.40 & 0.00  & 0.00  & 59.60 \\
+    36.36 & 0.00  & 0.00  & 63.64 \\
+    32.32 & 0.00  & 0.00  & 67.68 \\
+    \bottomrule
+    \end{tabular}%
+      \caption{PTM with Gates}
+  \label{tab:addlabel}%
+\end{table}%
+
+
+\end{document}
+
+% - Release $Name:  $ -
