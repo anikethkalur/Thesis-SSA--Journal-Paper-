@@ -100,18 +100,41 @@ Closely spaced debris creates an setting that is very similar to a multi-target 
 \section{Introduction}
 
 Space situational awareness deals with collecting and maintaining knowledge of all objects orbiting the earth. Space Situational Awareness (SSA) is defined
-as the comprehensive knowledge of space objects and the ability to track, understand and predict their future location \cite{becker_space_2015}. These objects are also called orbital debris, which are a collection of defunct objects that orbit around earth. These objects pose a major threat to operational spacecrafts. In space, uncontrolled objects do not follow a straight line, each piece of debris is subjected to drift and decay. Variation of earths gravitational field causes drift and this can lead to gradual movement of object from one orbital plane to another. Atmospheric drag is a major cause orbital decay, thereby causing a slow decrease in altitude of the debris. \\
+as the comprehensive knowledge of space objects and the ability to track, understand and predict their future location \cite{becker_space_2015}. The orbits in space are comprised of functional and defunct objects. The basic difference between the functional and defunct objects in space is that the functional objects are actively controlled and their attitudes and position can be maintained to accomplish mission objectives. However, it is not the same with defunct objects in space-these objects cannot be actively controlled for attitude and positional corrections. Inability to control the objects that are in space renders them as space  junk, these objects are rarely of  any use and cause a threat to the functional objects that are currently in orbit. These defunct objects are either spent rocket stages, old satellite or parts of spacecrafts that were once functional but not anymore.    These defunct objects are often referred to as orbital debris. In space, uncontrolled objects do not follow a straight line, each piece of debris is subjected to drift and decay. Variation of earths gravitational field causes drift and this can lead to gradual movement of object from one orbital plane to another. Atmospheric drag is a major cause orbital decay, thereby causing a slow decrease in altitude of the debris. \\
 
  A very common term associated with Resident Space Objects (RSOs) in space is the \textit{Kessler syndrome}. Kessler syndrome theorizes that creation of new debris occurs faster than time taken by natural forces to remove them. As space object density  increases, the collision between objects could cause a cascading effect i.e. each collision generating more debris and thereby increasing the likelihood of further collisions. There are more than 21,000 piece of debris with a radius larger than 10 centimeters  - similar to that of a soft ball\cite{nasa_nasa_2015}. These 21,000 pieces of debris are open to the same threat of collisions as defined by the Kessler syndrome. A recent statistic talks about how the International Space Station (ISS) had to perform 5 collision avoidance maneuvers in 2014, this has been the highest number of avoidance maneuvers recorded since 1998~\cite{nasa_orbital_2015}. On JUL 16, 2015 the international space station crew were forced to scramble to safety in the Soyuz escape capsule after NASA received data on a fast approaching space debris\cite{evasive_2015}. The data regarding a debris being in close proximity, and on a probable collision course with the ISS was  received late and was imprecise as well. Hence the ISS could not make any evasive maneuvers. These close calls not only endanger humans lives but pose a major threat to the many functional spacecrafts and scientific equipment present in space. This makes it imperative to effectively study and develop methods for information fusion and RSO identification to improve space situational awareness.\\
+ 
+The primary step in resolving the ever growing issue of space debris is the identification
+of RSOs. RSOs are identified by matching sensor measurements (e.g. space-surveillance telescope
+data) to a catalog of previously identified objects. If the current RSO cannot be matched with any
+cataloged object, that object is deemed a newly identified object and is placed in the catalog and
+monitored throughout its entire life span. A catalog is simply a directory of objects that includes
+information pertaining to the object's estimated position and characteristics such as mass and size.
+The process of matching sensor measurements to a target, or RSO, is known as data association.
+Data association is fundamental in determining which RSOs within a telescope's field-of-view (FOV)
+are cataloged and which are previously unidentified objects. An accurate and up-to-date RSO catalog
+is critical in avoidance maneuver planning and overall space situational awareness \cite{Silversmith}.\\
 
 A lot of work is being done in the field of space situational awareness in the recent years. A common element among all of the other works in this field is that a customized approach for
-each technique is required for astrodynamics applications. The work on tracking multiple number of objects using finite-set statistics and finite mixture models representation of multi object probability density function is developed in Ref.~\citen{demars_2015}. The use of magnetometers in identifying space objects in geosynchronous orbits has been studied and discussed in Ref.~\citen{holzinger_2014}. The system requirements and challenges of multi-target tracking for space situational awareness have been addressed and the $\partial$- Genral Labeled Multi-Bernoulli ($\partial$-GLMB) filter has been studied. The additional work on pattern recognition has led to the development of a method that uses planar triangle properties for spacecraft attitude determination in lieu of the angle method.  This method is the planar triangle method (PTM). The PTM is shown to be an accurate and efficient method of pattern recognition and has been proven to work very well for spacecraft attitude determination \cite{cole_fast_2006}. Pattern recognition is another approach to data association. Pattern recognition algorithms attempt to match measurements with a certain target by using geometric data analysis. Given a cluster of data and stored \textit{a priori} knowledge of the suspected targets, it is anticipated that this data will maintain a specific pattern that can be associated with the assigned targets. This work uses the planar triangle methods as an effective pattern recognition methods for effective RSO identification, the details of will be explained in Section \ref{model}.\\ 
+each technique is required for astrodynamics applications. The work on tracking multiple number of objects using finite-set statistics and finite mixture models representation of multi object probability density function is developed in Ref.~\citen{demars_2015}. The use of magnetometers in identifying space objects in geosynchronous orbits has been studied and discussed in Ref.~\citen{holzinger_2014}. The system requirements and challenges of multi-target tracking for space situational awareness have been addressed and the $\partial$- Genral Labeled Multi-Bernoulli ($\partial$-GLMB) filter has been studied.\\
 
-The problem of identifying the true object from a cluster of similar objects can be addressed by data association. These problems have been very well studied in case of target tracking and multiple target tracking in  Ref. \citen{design_tracking}. The process of matching a measured object to its truth is called data association. The study of data association has been studied in detail for target tracking in surveillance systems employing one or more sensors. Many algorithms like the nearest neighbor (NN), global nearest neighbor(GNN), multiple hypothesis tracking (MHT), joint probabilistic data association (JPDA) have been extensively studied in Ref.\citen{design_tracking}. However, coupling traditional data association techniques with other methods in the field of space situational awareness is still in uncharted frontiers. In this paper we use traditional data association methods like elliptical/validation gates to optimize the identification of the RSO using the PTM. The elliptical gates and its use will be discussed in Section \ref{model}.
+This work provides an alternate data association method for identification of RSO-using pattern recognition. Pattern recognition is a mature subject in the
+functionality of star trackers. A star tracker is an optical device which collects star measurements in order to determine the attitude of its host spacecraft. One way stars are identified is by comparing
+the angles between observed stars in the star tracker's FOV with angles stored in a star catalog \cite{Silversmith}.
+This identification process is known as the angle method. If the angles of the observed stars match
+the angles of a set of stars in the catalog, then the spacecraft's attitude is known. However, the
+primary goal here is to consistently, with high accuracy, identify stars within the star tracker's FOV
+without requiring significant computation effort
+The additional work on pattern recognition has led to the development of a method that uses planar triangle properties for spacecraft attitude determination in lieu of the angle method.  This method is the planar triangle method (PTM). The PTM is shown to be an accurate and efficient method of pattern recognition and has been proven to work very well for spacecraft attitude determination \cite{cole_fast_2006}. Pattern recognition algorithms attempt to match measurements with a certain target by using geometric data analysis. Given a cluster of data and stored \textit{a priori} knowledge of the suspected targets, it is anticipated that this data will maintain a specific pattern that can be associated with the assigned targets. This work uses the planar triangle methods as an effective pattern recognition methods for effective RSO identification, the details of will be explained in Section \ref{model}.\\ 
+
+The problem of identifying the true object from a cluster of similar objects can be addressed by data association. These problems have been very well studied in case of target tracking and multiple target tracking in  Ref. \citen{design_tracking}. The process of matching a measured object to its truth is called data association. The study of data association has been studied in detail for target tracking in surveillance systems employing one or more sensors. Many algorithms like the nearest neighbor (NN), global nearest neighbor(GNN), multiple hypothesis tracking (MHT), joint probabilistic data association (JPDA) have been extensively studied in Ref.\citen{design_tracking}. However, coupling traditional data association techniques with other methods in the field of space situational awareness is still in uncharted frontiers. In this paper we use traditional data association methods like elliptical/validation gates to optimize the identification of the RSO using the PTM. The elliptical gates and its use will be discussed in Section \ref{model}. 
 
 \subsection{RSO Modeling}
 
- For the purpose of RSO modeling the study of interactions of bodies under the influence of gravity, while in space is essential. The ubiquitous two body problem helps us understand the interactions between two bodies under the influence of gravity,this has been explained in section \ref{Two-Body Problem}. Numerical integration is another important concept required to understand how RSO's have been modeled for the purpose of simulation. Once we have the equation of motions setup, we will use an integrator to solve the ordinary differential equations. The integrator used in our case is the \textit{Runge-Kutta Fourth Order} integrator. The basics of this integrator have been explained in section \ref{RKO}.
+ For the purpose of RSO modeling the study of interactions of bodies under the influence of gravity, while in space is essential. The ubiquitous two body problem helps us understand the interactions between two bodies under the influence of gravity,this has been explained in section \ref{Two-Body Problem}. Another very important aspect to be considered while modeling the dynamics of RSO is the orbital errors and their effects. This paper will briefly touch on the orbital errors involved, while discussing the J-2 perturbations. The orbital errors have been discussed in section \ref{orbital perturbations} .\\ 
+ 
+ 
+Numerical integration is another important concept required to understand how RSO's have been modeled for the purpose of simulation. Once we have the equation of motions setup, we will use an integrator to solve the ordinary differential equations. The integrator used in our case is the \textit{Runge-Kutta Fourth Order} integrator. The basics of this integrator have been explained in section \ref{RKO}.
 \subsubsection{Two-Body Problem}
 \label{Two-Body Problem}
 
@@ -164,6 +187,13 @@ Eq. \eqref{eq:rddot} with $J_2$ takes the form
 \mathbf{\ddot{r}}=-\frac{\mu_g}{r^3}\mathbf{r}+\mathbf{a}_{J_2}
 \end{gather}
 
+\subsubsection{Orbital Perturbations}
+\label{orbital perturbations}
+
+There are other forces acting on a satellite that perturb it away from the nominal orbit. These perturbations, or variations in the orbital elements, can be classified based on how they affect the Keplerian elements. The three basic type of orbital perturbations are secular variations, short period variations and long period variations. Secular variations have a long term linear variation on the orbit prediction, they cause the orbital elements to increase or decrease as time progresses. The main types of perturbation faced by a body in space are third body perturbations, atmospheric drag, J-2 perturbations, solar radiation pressure, etc.\\
+
+Here, we will discuss about the J-2 effects that have been modeled in our orbital dynamics. When developing the two-body equations of motion, we assumed the Earth was a spherically symmetrical, homogeneous mass. In fact, the Earth is neither homogeneous nor spherical. The most dominant features are a bulge at the equator, a slight pear shape, and flattening at the poles. For a potential function of the Earth, we can find a satellite's acceleration by taking the gradient of the potential function. The most widely used form of the geopotential function depends on latitude and geopotential coefficients, $J_{n}$, called the zonal coefficients \cite{basics_obital_mechanics}.
+This acceleration due to $J_2$ has been modeled in our dynamics and can be seen in section \ref{Two-Body Problem}.
 \subsubsection{Fourth-Order Runge Kutta Method}
 \label{RKO}
 
@@ -180,7 +210,6 @@ k_2 &= f(x_{n+1},y_n+k_3)
 \end{aligned}
 \end{gather}
 \end{subequations}
-
 where $h$ is the chosen step size, $n$ represents the current estimate and $n+1$ represents the updated estimate. A step size having approximate resolution should be chosen to avoid significant accumulation of error. The state update is given by
 \begin{align}
 y_{n+1}=y_n+\frac{1}{6}(k_1+2k_2+2k_3+k_4)
@@ -190,9 +219,9 @@ y_{n+1}=y_n+\frac{1}{6}(k_1+2k_2+2k_3+k_4)
 
 \subsection{Planar Triangle Method}
 
-The planar triangular method and the spherical triangular methods are both pattern recognition algorithms for spacecraft attitude determination. Both these methods are extensions to the popular angle method. In this paper we will discuss only about the PTM. The details of the spherical triangular method can be found in Ref.~\citen{STM}. It is strongly encouraged to review Ref.~\citen{PTM} for a complete derivation of the planar triangle method. It has been determined by Cole that the planar triangle method yields similar performance to that of the spherical triangle method\cite{PTM}. Therefore, the planar triangle method is preferred over spherical triangle method due to reduced complexity and computational cost. Alike the spherical triangle method, the planar triangle method requires that there be at least three stars present in the FOV. This stems from the fact that the planar triangle method creates planar triangles from combinations of three stars. Again, it will be necessary to introduce pivoting with the planar triangle method to reduce multiple solutions.\\
+The planar triangular method and the spherical triangular methods (STM) are both pattern recognition algorithms for spacecraft attitude determination. Both these methods of attitude determination are extensions to the popular angle method. The angle method requires two position vectors while the STM and PTM require three position vectors. Even so the novelty lies in the fact that the STM and PTM require less pivoting and provide a more consistent solution when compared to the angle method for attitude determination. In this paper we will discuss only about the PTM. The details of the spherical triangular method can be found in Ref.~\citen{STM}. This paper covers the details of the PTM for space situational awareness applications. It is strongly encouraged that the reader review Ref.~\citen{PTM} for a complete understanding and derivation of the planar triangle method. It has been determined by Cole that the planar triangle method yields similar performance to that of the spherical triangle method\cite{PTM}. Therefore, the planar triangle method is preferred over spherical triangle method due to reduced complexity and computational cost. Alike the spherical triangle method, the planar triangle method requires that there be at least three stars present in the FOV. This stems from the fact that the planar triangle method creates planar triangles from combinations of three stars. Again, it will be necessary to introduce pivoting with the planar triangle method to reduce multiple solutions.\\
 
-The PTM uses the stars/debris present in the FOV to form triangles, the area and polar moment of the triangles are then calculated. The catalog is then searched for matching areas and polar moments. If multiple matches are found then one of the vertex of the triangle is pivoted using another star. This process is continued until a single solution can be reached. The planar triangle method need a minimum of three stars in the debris in the FOV.
+The PTM works on a elementary concept of pattern recognition i.e. pattern matching for identification of space debris. The PTM uses the stars/debris present in the FOV to form triangles, the area and polar moment of the triangles are then calculated. The catalog is then searched for matching areas and polar moments. If multiple matches are found then one of the vertex of the triangle is pivoted using another star. This process is continued until a single solution can be reached. The planar triangle method need a minimum of three stars in the debris in the FOV. For the purpose of matching debris in the FOV with that of the ones present in the catalog, the PTM exploits information using some simple geometrical properties of triangles. The geometrical properties used for matching have been discussed in subsection \ref{PTM Properties} of this section. 
 
 \begin{figure}[t]
 \label{triangles_with_Stars}
@@ -202,6 +231,7 @@ The PTM uses the stars/debris present in the FOV to form triangles, the area and
 \end{figure}
 
 \subsubsection{Planar Triangle Properties}
+\label{PTM Properties}
 
 The two properties used by the PTM to identify the stars in the FOV are area and polar moment of the planar triangles. The area of the planar triangle can be given by the Herons formula as \cite{cole_fast_2006}.
 
@@ -397,13 +427,37 @@ where, $n_v$ is the number of measurements. Application of nearest neighbor for 
 \item Update the match as if it were the correct measurement
 \end{enumerate}
 
+\subsection{RSO Measurement Errors and Catalog}
+
+It is known that the PTM will match the debris observed in FOV to that present in the catalog. Furthermore, it is one of the concentrations of this work to study the effect of the measurement
+error on the performance of the planar triangle catalog. In order to perform this study, two catalogs
+need to be created. The first catalog is created using the true unit position vectors of the 4000 total
+RSOs and the second catalog is created using the measured unit position vectors.
+\begin{align}
+\label{Rm}
+\textbf{R}_{m} = 
+\begin{bmatrix}
+\sigma_x^2 & 0 & 0\\
+0 & {\sigma_y}^2  & 0\\
+0 & 0 & {\sigma_z}^2
+\end{bmatrix}
+\end{align}
+It is also assumed that $ \sigma_m = \sigma_x = \sigma_y = \sigma_z$.  The key variable in the performance
+testing of the planar triangle method is the variable $\sigma_m$. Now, since we assumed that the debris data contains measurement error, there is no source of truth data. This is typically the case in most real-world applications. However, if the debris data is assumed to have measurement error according to \eqref{Rm}, then the truth must lie within these
+bounds. Therefore, it is assumed that the truth position vectors can be represented by,
+
+\begin{align}
+\textbf{r}_{truth}(i) = \textbf{r}_{rso} + randn(1,3) \times chol[\textbf{R}_m(i)], i = 1,2,...,n
+\end{align}
+
+
 \section{Simulation}
 
 To simulate realistic conditions we have used the data from infamous incident of the Chinese government intentionally destroying the Fengyun 1C satellite; this satellite was destroyed in  an attempt to test their anti-satellite weapons program.  The Chinese weather satellite was launched into a Sun-synchronous orbit with a mean altitude of 850 km and an inclination of 98.8 degrees \cite{johnson_characteristics_2008}. The 2000 pieces of debris data of the Fengyun 1C available on www.celestrak.com. Another 2000 pieces of debris were simulated due to debris not being  being visible from the chosen site \cite{silversmith}. The details of the simulated debris can be found in \cite{silversmith}.\\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width= 0.6\textwidth]{2lineelement}
+\includegraphics[width= 0.6\textwidth]{2lineelement_gray}
 \caption{The Two Line Element Format; source NASA}
 \label{TLE}
 \end{figure}
@@ -591,7 +645,7 @@ The purpose of this work is to prove that the accuracy of the PTM can be improve
 During the study it was found that a simple gating approach works well in cases where the FOV is not cluttered with debris. The simple gating approach for an uncluttered FOV proves to have a better performance under varying measurement errors in the debris position, when compared to the PTM. Figure \ref{GatingVsPTM} shows the accuracy of the gating method compared to the PTM. The x-axis in \cref{GatingVsPTM} has the run number and the \cref{map} maps the run number to the corresponding measurement error for each case.\\
 \begin{figure}[h]
 \centering
-\includegraphics[width = 0.6\textwidth]{gatingVsPTM}
+\includegraphics[width = 0.6\textwidth]{gatingVsPTM_gray}
 \caption{Accuracy of the Gating Methods Compared to the PTM in an Uncluttered FOV}
 \label{GatingVsPTM}
 \end{figure}
@@ -611,7 +665,7 @@ The performance of ellipsoidal gating methods is also studied in a cluttered env
 
 \begin{figure}[h]
 \centering
-\includegraphics[width= 0.6\textwidth]{gatingInClutter}
+\includegraphics[width= 0.6\textwidth]{gatingInClutter_gray}
 \caption{Accuracy of the Gating Method in a Cluttered Environment}
 \label{gatingInClutter}
 \end{figure}
@@ -620,7 +674,7 @@ A study is also performed on the performance of the PTM in a cluttered FOV, wher
 
 \begin{figure}[h]
 \centering
-\includegraphics[width= 0.6\textwidth]{PTMInClutter}
+\includegraphics[width= 0.6\textwidth]{PTMInClutter_gray}
 \caption{Comparision of PTM with the Gating Method for Varying Measurement Errors}
 \label{PTMInClutter}
 \end{figure}
@@ -629,7 +683,7 @@ Since it is clear that the gating method cannot be used as a standalone method f
 
 \begin{figure}[h]
 \centering
-\includegraphics[width= 0.6\textwidth]{PTMWithGate}
+\includegraphics[width= 0.6\textwidth]{PTMWithGate_gray}
 \caption{Performance Comparison Between PTM and PTM with Elliptical Gates}
 \label{PTMWithGate}
 \end{figure}
@@ -638,7 +692,7 @@ It can be seen that the PTM with gates performs better than the PTM. The PTM wit
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.7\textwidth]{PTMWithGate2}
+\includegraphics[width=0.7\textwidth]{PTMWithGate2_gray}
 \caption{Performance Comparison Between PTM and PTM with Elliptical Gates}
 \label{PTMWithGate2}
 \end{figure}
@@ -704,7 +758,7 @@ It is clear from the hypothesis testing that our method works efficiently and al
 
 \bibliographystyle{aiaa}
 \bibliography{AIAA-SSA}
-
+\newpage
 \section*{Appendix}
 \subsection{Results of PTM and PTM with Gates}
 
